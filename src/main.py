@@ -1,8 +1,13 @@
 import flet as ft
 
+from config import ASSETS_DIR
+
 
 def main(page: ft.Page):
-    page.add(ft.Text("Hello, World!", size=50))
+    page.window.width = page.window.height = 800
+    page.window.resizable = False
+    page.add(ft.Text("Hello World!", size=50))
 
 
-ft.app(main)
+if __name__ == "__main__":
+    ft.app(target=main, assets_dir=ASSETS_DIR)

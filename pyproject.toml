@@ -16,4 +16,7 @@ product = "chess"
 path = "src"
 
 [tool.uv]
-dev-dependencies = ["flet[all]==0.27.6"]
+dev-dependencies = [
+    "flet[all]==0.27.6",
+    "pytest>=8.3.5",
+]
