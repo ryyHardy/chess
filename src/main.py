@@ -1,6 +1,6 @@
 import flet as ft
 
-from config import ASSETS_DIR
+from src.config import ASSETS_DIR
 
 
 def main(page: ft.Page):

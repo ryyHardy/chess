@@ -1,9 +1,18 @@
-from board import Board
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+from .board import ChessBoard
 
 
+@dataclass
 class ChessGame:
-    def __init__(self, fen: str = None):
-        self.__made_moves = []
+    board: ChessBoard
+    made_moves = []
+
+    @staticmethod
+    def from_fen(fen: str) -> ChessGame:
+        pass
 
     def make_move(self, move: str) -> bool:
         """Make a move in the game

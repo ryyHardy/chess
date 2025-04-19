@@ -5,7 +5,7 @@ description = ""
 readme = "README.md"
 requires-python = ">=3.9"
 authors = [{ name = "Ryan Hardy", email = "ryyHardy@gmail.com" }]
-dependencies = ["flet==0.27.6"]
+dependencies = ["flet[all]==0.27.6"]
 
 [tool.flet]
 # project display name that is used as an app title on Android and iOS home screens,
@@ -18,5 +18,6 @@ path = "src"
 [tool.uv]
 dev-dependencies = [
     "flet[all]==0.27.6",
-    "pytest>=8.3.5",
+ "pyinstaller>=6.13.0",
+ "pytest>=8.3.5",
 ]

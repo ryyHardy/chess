@@ -35,17 +35,20 @@ class Piece:
 
     @staticmethod
     def from_fen_symbol(fen: str) -> Piece:
-        """Creates a Piece object from a FEN symbol
+        """Creates a piece matching a FEN symbol
 
-        :param fen: The FEN symbol. Case determines color and letter determines type. Valid letters are p, r, n, b, q, and k
+        :param fen: The FEN symbol determining the type and color of the piece
         :type fen: str
-        :return: A Piece object with its color and type set according to the FEN symbol
+        :return: The piece corresponding to the provided FEN symbol
         :rtype: Piece
+        :raises ValueError: If the FEN symbol is not one of "prnbqkPRNBQK"
         """
-        color = PieceColor.WHITE if fen.isupper() else PieceColor.BLACK
-        piece_type = FEN_MAP[fen.lower()]
-
-        return Piece(piece_type, color)
+        try:
+            color = PieceColor.WHITE if fen.isupper() else PieceColor.BLACK
+            piece_type = FEN_MAP[fen.lower()]
+            return Piece(piece_type, color)
+        except KeyError:
+            raise ValueError(f"Invalid FEN symbol '{fen}' used to create piece")
 
     def is_king(self) -> bool:
         return self.type.value.lower() == "k"
