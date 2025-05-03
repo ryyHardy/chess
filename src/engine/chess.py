@@ -1,18 +1,32 @@
+"""
+Contains a class for the chess game
+
+A chess game encapsulates the board and game state, providing an interface to play the game
+"""
+
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from .board import ChessBoard
+from .piece import PieceColor
 
 
 @dataclass
 class ChessGame:
-    board: ChessBoard
-    made_moves = []
+    board: ChessBoard = field(default_factory=ChessBoard)
 
-    @staticmethod
-    def from_fen(fen: str) -> ChessGame:
-        pass
+    active_color: PieceColor = PieceColor.WHITE
+
+    white_castle_kingside: bool = True
+    white_castle_queenside: bool = True
+    black_castle_kingside: bool = True
+    black_castle_queenside: bool = True
+
+    en_passant_square: tuple[int, int] | None = None
+
+    halfmove_counter: int = 0
+    fullmove_counter: int = 1
 
     def make_move(self, move: str) -> bool:
         """Make a move in the game

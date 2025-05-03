@@ -1,9 +1,22 @@
+"""
+Contains the data structure for the chess board itself
+
+The chess board is responsible for managing piece positions
+
+The board is indexed via row and column indices (row,col), where (0,0) is a1 and (7,7) is h8
+"""
+
 from dataclasses import dataclass, field
 
-from .piece import Piece, PieceColor, PieceType
+from .piece import Piece, PieceColor
 
 
 def create_empty_squares() -> list[list[Piece | None]]:
+    """Creates an empty 8x8 grid to pass to the board
+
+    :return: An empty 8x8 grid that can be filled with pieces
+    :rtype: list[list[Piece | None]]
+    """
     return [[None for _ in range(8)] for _ in range(8)]
 
 
@@ -52,18 +65,3 @@ class ChessBoard:
                 piece = self.squares[row][col]
                 if piece and piece.is_king() and piece.color == color:
                     return (row, col)
-
-    @staticmethod
-    def from_fen(fen: str = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"):
-        board = ChessBoard()
-        row, col = 7, 0
-        for c in fen.split()[0]:
-            if c == "/":
-                row -= 1
-                col = 0
-            elif c.isdigit():
-                col += int(c)
-            else:
-                board.set_piece(Piece.from_fen_symbol(c), row, col)
-                col += 1
-        return board
