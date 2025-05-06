@@ -7,6 +7,7 @@ A chess game encapsulates the board and game state, providing an interface to pl
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Literal
 
 from .board import ChessBoard
 from .piece import PieceColor
@@ -28,6 +29,8 @@ class ChessGame:
     halfmove_counter: int = 0
     fullmove_counter: int = 1
 
+    __legal_moves: list[str] = field(default_factory=list)
+
     def make_move(self, move: str) -> bool:
         """Make a move in the game
 
@@ -44,9 +47,9 @@ class ChessGame:
         :return: A list of strings (algebraic notation) representing all current legal moves
         :rtype: list[str]
         """
-        pass
+        return self.__legal_moves
 
-    def current_turn(self) -> str:
+    def current_turn(self) -> Literal["white", "black"]:
         """Get the current turn
 
         :return: "white" or "black"
@@ -63,7 +66,7 @@ class ChessGame:
         pass
 
     def is_checkmate(self) -> bool:
-        """Determine whether the current player is checkamted
+        """Determine whether the current player is checkmated
 
         :return: Whether the current player is checkmated
         :rtype: bool
@@ -76,11 +79,12 @@ class ChessGame:
         :return: Whether the game is in stalemate
         :rtype: bool
         """
+        pass
 
     def get_fen(self) -> str:
         """Create a FEN string for the current position
 
-        :return: _description_
+        :return: FEN string for the game's current position
         :rtype: str
         """
         pass

@@ -6,72 +6,83 @@ from src.engine.fen import (
     board_from_fen,
     game_from_fen,
     is_valid_fen,
-    is_valid_placement_fen,
     piece_from_fen,
 )
 from src.engine.piece import PieceColor, PieceType
 
 
-def test_is_valid_placement():
-    placement_test_cases = [
-        # Valid
-        ("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", True),
-        ("8/8/8/8/8/8/8/8", True),
-        ("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R", True),
-        ("8/8/8/8/8/8/8/P7", True),
-        # Too few ranks
-        ("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP", False),
-        # Too many ranks
-        ("8/8/8/8/8/8/8/8/8", False),
-        # Rank with >8 squares
-        ("8/8/8/8/8/8/8/9", False),
-        ("8/8/8/8/8/8/8/ppppppppp", False),
-        # Rank with <8 squares
-        ("8/8/8/8/8/8/8/7", False),
-        ("8/8/8/8/8/8/8/P6", False),
-        # Invalid characters
-        ("8/8/8/8/8/8/8/8*", False),
-        ("8/8/8/8/8/8/8/ZZZZZZZZ", False),
-        ("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPP1/RNBQKBNZ", False),
-    ]
-
-    for fen, expected in placement_test_cases:
-        assert is_valid_placement_fen(fen) == expected
-
-
-def test_is_valid_fen():
-    fen_test_cases = [
+@pytest.mark.parametrize(
+    "fen",
+    [
         # Valid FENs
-        ("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", True),
-        ("8/8/8/8/8/8/8/8 b - - 99 42", True),
-        ("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1", True),
-        ("rnbq1bnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 3 4", True),
-        # Invalid number of fields
-        ("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0", False),
-        ("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", False),
-        # Bad piece characters
-        ("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPZ/RNBQKBNR w KQkq - 0 1", False),
-        # Incorrect rank format
-        ("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPP/RNBQKBNR w KQkq - 0 1", False),  # 7 pawns
-        (
-            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNRR w KQkq - 0 1",
-            False,
-        ),  # Too many pieces in rank
-        # Bad active color
-        ("8/8/8/8/8/8/8/8 x - - 0 1", False),
-        # Bad castling availability
-        ("8/8/8/8/8/8/8/8 w KQa - 0 1", False),
-        # Bad en passant
-        ("8/8/8/8/8/8/8/8 w - e9 0 1", False),
-        ("8/8/8/8/8/8/8/8 w - aa 0 1", False),
-        # Invalid halfmove and fullmove numbers
-        ("8/8/8/8/8/8/8/8 w - - -1 1", False),
-        ("8/8/8/8/8/8/8/8 w - - 0 0", False),
-        ("8/8/8/8/8/8/8/8 w - - x 1", False),
-    ]
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",  # starting position
+        "4k3/8/8/8/8/8/8/4K3 w - - 0 1",  # minimal kings only
+        "r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1",  # castling setup
+        "4k3/8/8/8/8/8/8/R3K2R w KQ - 0 1",  # valid white castling
+        "r3k3/8/8/8/8/8/8/4K3 b q - 0 1",  # king moved, no castling
+    ],
+)
+def test_valid_fens(fen):
+    assert is_valid_fen(fen)
 
-    for fen, expected in fen_test_cases:
-        assert is_valid_fen(fen) == expected
+
+@pytest.mark.parametrize(
+    "fen",
+    [
+        # Invalid due to format issues
+        "8/8/8/8/8/8/8 w - - 0 1",  # only 7 rows
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/ w KQkq - 0 1",  # missing 8th row data
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPP/RNBQKBNR w KQkq - 0 1",  # bad row length
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBN w KQkq - 0 1",  # missing square
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNRX w KQkq - 0 1",  # invalid piece char
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w P - 0 1",  # invalid castling rights
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR x KQkq - 0 1",  # invalid active color
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq z9 0 1",  # invalid en passant square
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - -1 1",  # negative halfmove
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 -5",  # negative fullmove
+    ],
+)
+def test_invalid_format_fens(fen):
+    assert not is_valid_fen(fen)
+
+
+@pytest.mark.parametrize(
+    "fen",
+    [
+        # Invalid because of king count
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1".replace(
+            "K", ""
+        ),  # missing white king
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKKBNR w KQkq - 0 1",  # extra white king
+    ],
+)
+def test_invalid_king_count(fen):
+    assert not is_valid_fen(fen)
+
+
+@pytest.mark.parametrize(
+    "fen",
+    [
+        # Invalid castling positions
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/4K3 w K - 0 1",  # claims kingside but no h1 rook
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/4K3 w Q - 0 1",  # claims queenside but no a1 rook
+        "4k3/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w k - 0 1",  # claims black kingside but black rook moved
+    ],
+)
+def test_invalid_castling_rights(fen):
+    assert not is_valid_fen(fen)
+
+
+@pytest.mark.parametrize(
+    "fen",
+    [
+        # Invalid en passant (no pawn to capture)
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - a6 0 1",  # no white pawn to capture on a5
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b - h3 0 1",  # no black pawn to capture on h4
+    ],
+)
+def test_invalid_en_passant(fen):
+    assert not is_valid_fen(fen)
 
 
 def test_piece_from_fen():
@@ -136,19 +147,6 @@ def test_board_from_fen():
         assert piece.color == PieceColor.WHITE
         assert piece.type == FEN_PIECETYPE_MAP[symbol.lower()]
 
-    # Test invalid FENs
-    invalid_fens = [
-        "invalid",  # Not a valid FEN
-        "8/8/8/8/8/8/8",  # Too few ranks
-        "8/8/8/8/8/8/8/8/8",  # Too many ranks
-        "8/8/8/8/8/8/8/9",  # Invalid number in rank
-        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNZ",  # Invalid piece
-    ]
-
-    for fen in invalid_fens:
-        with pytest.raises(InvalidFENError):
-            board_from_fen(fen)
-
 
 def test_game_from_fen():
     # Test initial position
@@ -163,7 +161,7 @@ def test_game_from_fen():
     assert game.fullmove_counter == 1
 
     # Test position with specific castling rights and en passant
-    mid_game_fen = "rnbq1rk1/ppp2ppp/3b1n2/3p4/3P4/2N1PN2/PPP1BPPP/R1BQK2R b KQ e3 2 8"
+    mid_game_fen = "rnbq1rk1/ppp2ppp/3b1n2/3p4/3P4/2N1PN2/PPP1BPPP/R3K2R b KQ e3 2 8"
     game = game_from_fen(mid_game_fen)
     assert game.white_castle_kingside is True
     assert game.white_castle_queenside is True

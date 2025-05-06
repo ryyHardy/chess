@@ -11,3 +11,4 @@ def test_is_king():
             assert piece.is_king()
         else:
             assert not piece.is_king()
+        assert not piece.has_moved

@@ -30,6 +30,7 @@ class PieceColor(Enum):
 class Piece:
     type: PieceType
     color: PieceColor
+    has_moved: bool = False
 
     def is_king(self) -> bool:
         return self.type.value.lower() == "k"
